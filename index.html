@@ -1587,7 +1587,7 @@
 --shadow-sm:0 4px 6px rgba(0,0,0,0.1); --shadow-md:0 10px 15px -3px rgba(0,0,0,0.2);
 --shadow-lg:0 20px 25px -5px rgba(0,0,0,0.3); --radius:12px; --transition:all 0.3s ease;
 }
-*{box-sizing:border-box;margin:0;padding:0;}
+* {box-sizing:border-box;margin:0;padding:0;}
 html,body{background:var(--darker);color:var(--text);font-family:'Poppins','Tiro Bangla',system-ui,sans-serif;line-height:1.6;min-height:100vh;overflow-x:hidden;scrollbar-width:none;-ms-overflow-style:none;}
 body::-webkit-scrollbar{display:none;}
 .bangla-font{font-family:'Tiro Bangla','Poppins',serif;}
@@ -1634,6 +1634,18 @@ body::-webkit-scrollbar{display:none;}
 .warning-message{background:var(--warning);color:white;padding:15px;border-radius:10px;margin-bottom:20px;text-align:center;font-size:0.9rem;}
 @media(max-width:768px){.container{padding:15px;margin:20px;}.modal-content{padding:20px;max-height:90vh;}.action-buttons{flex-direction:column;gap:10px;}.form-button,.submissions-button,.comment-button,.reply-button,.admin-button{width:100%;justify-content:center;}}
 @media(max-width:480px){.modal-intro h2{font-size:1.2rem;}.form-section label,.form-section input,.form-section select,.form-section textarea,.submit-button{font-size:0.85rem;}.submission-item{padding:12px;}.submission-name,.submission-message{font-size:0.85rem;}.submission-batch,.submission-time{font-size:0.75rem;}}
+.reply-input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 8px;
+  border: 1px solid var(--card-border);
+  background: var(--glass);
+  color: var(--text);
+  font-size: 0.9rem;
+  resize: vertical;
+  min-height: 80px;
+}
 </style>
   <style>
 .notice-bar {
@@ -1921,6 +1933,19 @@ body::-webkit-scrollbar{display:none;}
       </div>
     </div>
   </div>
+  <div id="reply-modal" class="warning-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="bangla-font">অ্যাডমিনের উত্তর</h2>
+      </div>
+      <div class="modal-body" id="reply-body">
+        <!-- dynamic content -->
+      </div>
+      <div class="modal-footer">
+        <button class="modal-ok-btn bangla-font" id="reply-ok-btn">ঠিক আছে</button>
+      </div>
+    </div>
+  </div>
   <div id="notification" class="notification"></div>
   <!-- Dashboard Modal -->
   <div id="dashboard-modal" class="dashboard-modal">
@@ -1938,7 +1963,7 @@ body::-webkit-scrollbar{display:none;}
       <h2 class="bangla-font">নাম সেট করুন</h2>
       <p class="bangla-font">আপনার নাম লিখুন। এটি সেভ হয়ে যাবে এবং পরবর্তীতে কমেন্ট ও রিপ্লাই দেখার জন্য ব্যবহৃত হবে।</p>
       <div class="warning-message bangla-font">
-        দয়া করে আপনার পূর্ণ নাম ব্যবহার করুন, যাতে অন্য কারো সাথে নামের কোনো মিল না হয়। একটি স্বতন্ত্র এবং ব্যতিক্রমী নাম নির্বাচন করুন, যেন আপনার মতামত এবং উত্তর সঠিকভাবে সনাক্ত করা যায়।
+        দয়া করে আপনার পূর্ণ নাম ব্যবহার করুন, যাতে অন্য কারো সাথে নামের কোনো মিল না হয়। একটি স্বতন্ত্র এবং ব্যতিক্রমী নাম নির্বাচন করুন, যেন আপনার মতামত এবং ব্যত্তর সঠিকভাবে সনাক্ত করা যায়।
       </div>
     </div>
     <div class="form-section">
@@ -2060,6 +2085,9 @@ function showWarningModal() {
 
 function closeWarningModal() {
   warningModal.classList.remove('show');
+  if (getUserRole() === 'user' && storedName) {
+    fetchRepliesAndShow();
+  }
 }
 
 function showNotification(message, isError = false, isWarning = false) {
@@ -2258,6 +2286,7 @@ function normalizeRows(rows) {
         const title = row.title || (subject === 'মিশন' ? 'মিশন' : subject === 'ইক্সাম' ? 'ইক্সাম' : 'ক্লাস ভিডিও');
         const date = getDateFromTimestamp(timestamp);
         const time = getTimeFromTimestamp(timestamp);
+        const displaySerial = index + 1;
         const displaySerial = index + 1;
         const type = specialFolders.includes(subject) ? 'special' : subject === 'মিশন' ? 'mission' : subject === 'ইক্সাম' ? 'exam' : 'class';
 
@@ -3031,11 +3060,10 @@ function hideForm(){ $('#formModal').style.display='none'; }
 function showSubmissions(){ 
   $('#submissionsModal').style.display='flex'; 
   
-  // শুধু এই ১ লাইন যোগ করুন
   $('#submissions-list').innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted)" class="bangla-font">লোড হচ্ছে...</div>';
   
   loadSubmissions(); 
-    }
+}
 
 function hideSubmissions(){ $('#submissionsModal').style.display='none'; }
 
@@ -3061,7 +3089,7 @@ function submitForm(event){
     submitBtn.disabled = false;
     if(txt.startsWith("Success")){
       form.reset(); hideForm(); showSuccessMessage();
-    }else {
+    }else{
       showNotification("ডেটা জমা হয়নি! আবার চেষ্টা করুন।", true);
     }
   })
@@ -3085,12 +3113,10 @@ function loadSubmissions() {
       const list = $('#submissions-list');
       list.innerHTML = '';
       
-      // শুধুমাত্র Dakhil-26 ব্যাচ ফিল্টার করুন
       const dakhil26Submissions = data.filter(item => 
         item.batch && item.batch.toString().toLowerCase().includes('dakhil-26')
       );
       
-      // নতুন থেকে পুরানো সাজানো
       dakhil26Submissions.sort((a, b) => new Date(b.timestamp || b.time) - new Date(a.timestamp || a.time));
       
       if (dakhil26Submissions.length === 0) {
@@ -3108,11 +3134,111 @@ function loadSubmissions() {
           ${item.reply ? `<div class="submission-reply bangla-font">উত্তর: ${item.reply}</div>` : ''}
           <div class="submission-time bangla-font">${item.time}</div>
         `;
+        
+        if (getUserRole() === 'owner' && !item.reply) {
+          div.innerHTML += `
+            <textarea class="reply-input bangla-font" placeholder="উত্তর লিখুন..."></textarea>
+            <button class="reply-btn bangla-font">উত্তর দিন</button>
+          `;
+        }
+        
         list.appendChild(div);
+
+        if (getUserRole() === 'owner' && !item.reply) {
+          const btn = div.querySelector('.reply-btn');
+          btn.addEventListener('click', () => {
+            const input = btn.previousElementSibling;
+            const reply = input.value.trim();
+            if (!reply) return showNotification('উত্তর লিখুন', true);
+            btn.disabled = true;
+            const data = {
+              action: 'addReply',
+              originalTime: item.time,
+              name: item.name,
+              batch: item.batch,
+              message: item.message,
+              reply: reply
+            };
+            fetch(WEB_APP_URL, {
+              method: 'POST',
+              body: JSON.stringify(data)
+            })
+            .then(res => res.text())
+            .then(txt => {
+              btn.disabled = false;
+              if (txt.startsWith('Success')) {
+                showNotification('উত্তর সফলভাবে যোগ করা হয়েছে!');
+                loadSubmissions(); // refresh
+              } else {
+                showNotification('উত্তর যোগ হয়নি', true);
+              }
+            })
+            .catch(() => {
+              btn.disabled = false;
+              showNotification('উত্তর যোগ হয়নি', true);
+            });
+          });
+        }
       });
     })
     .catch(() => showNotification("সাবমিশন লোড হয়নি! আবার চেষ্টা করুন।", true));
-    }
+}
+
+let pendingReplies = [];
+
+function fetchRepliesAndShow() {
+  fetch(WEB_APP_URL + '?action=getReplies')
+    .then(res => res.json())
+    .then(data => {
+      const viewed = JSON.parse(localStorage.getItem('viewedReplies') || '[]');
+      const oneMonthMs = 30 * 24 * 60 * 60 * 1000;
+      const now = Date.now();
+      pendingReplies = data.filter(item => 
+        item.name === storedName &&
+        !viewed.includes(item.timestamp) &&
+        (now - new Date(item.timestamp).getTime()) < oneMonthMs
+      );
+      pendingReplies.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp)); // old first
+      showNextReply();
+    })
+    .catch(err => console.error('Failed to fetch replies', err));
+}
+
+function showNextReply() {
+  if (pendingReplies.length > 0) {
+    const next = pendingReplies.shift();
+    showReply(next);
+  }
+}
+
+function showReply(reply) {
+  $('#reply-body').innerHTML = `
+    <p class="bangla-font"><strong>নাম:</strong> ${reply.name}</p>
+    <p class="bangla-font"><strong>সময়:</strong> ${reply.time}</p>
+    <p class="bangla-font"><strong>ব্যাচ:</strong> ${reply.batch}</p>
+    <p class="bangla-font"><strong>কমেন্ট:</strong> ${reply.message}</p>
+    <p class="bangla-font"><strong>উত্তর:</strong> ${reply.reply}</p>
+  `;
+  const replyModal = $('#reply-modal');
+  replyModal.classList.add('show');
+  $('#reply-ok-btn').onclick = () => {
+    closeReplyModal();
+    markReplyViewed(reply.timestamp);
+    showNextReply();
+  }
+}
+
+function closeReplyModal() {
+  const replyModal = $('#reply-modal');
+  replyModal.classList.remove('show');
+}
+
+function markReplyViewed(timestamp) {
+  const viewed = JSON.parse(localStorage.getItem('viewedReplies') || '[]');
+  viewed.push(timestamp);
+  localStorage.setItem('viewedReplies', JSON.stringify(viewed));
+}
+
 $('#form-button').addEventListener('click', handleFormClick);
 $('#submissions-button').addEventListener('click',showSubmissions);
 window.addEventListener('click',(e)=>{ 
