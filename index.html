@@ -1587,7 +1587,7 @@
 --shadow-sm:0 4px 6px rgba(0,0,0,0.1); --shadow-md:0 10px 15px -3px rgba(0,0,0,0.2);
 --shadow-lg:0 20px 25px -5px rgba(0,0,0,0.3); --radius:12px; --transition:all 0.3s ease;
 }
-* {box-sizing:border-box;margin:0;padding:0;}
+*{box-sizing:border-box;margin:0;padding:0;}
 html,body{background:var(--darker);color:var(--text);font-family:'Poppins','Tiro Bangla',system-ui,sans-serif;line-height:1.6;min-height:100vh;overflow-x:hidden;scrollbar-width:none;-ms-overflow-style:none;}
 body::-webkit-scrollbar{display:none;}
 .bangla-font{font-family:'Tiro Bangla','Poppins',serif;}
@@ -1634,18 +1634,6 @@ body::-webkit-scrollbar{display:none;}
 .warning-message{background:var(--warning);color:white;padding:15px;border-radius:10px;margin-bottom:20px;text-align:center;font-size:0.9rem;}
 @media(max-width:768px){.container{padding:15px;margin:20px;}.modal-content{padding:20px;max-height:90vh;}.action-buttons{flex-direction:column;gap:10px;}.form-button,.submissions-button,.comment-button,.reply-button,.admin-button{width:100%;justify-content:center;}}
 @media(max-width:480px){.modal-intro h2{font-size:1.2rem;}.form-section label,.form-section input,.form-section select,.form-section textarea,.submit-button{font-size:0.85rem;}.submission-item{padding:12px;}.submission-name,.submission-message{font-size:0.85rem;}.submission-batch,.submission-time{font-size:0.75rem;}}
-.reply-input {
-  width: 100%;
-  padding: 10px;
-  margin-top: 10px;
-  border-radius: 8px;
-  border: 1px solid var(--card-border);
-  background: var(--glass);
-  color: var(--text);
-  font-size: 0.9rem;
-  resize: vertical;
-  min-height: 80px;
-}
 </style>
   <style>
 .notice-bar {
@@ -1727,6 +1715,47 @@ body::-webkit-scrollbar{display:none;}
       background: var(--gradient-secondary);
     }
 
+    /* New Search Results Styles */
+    #search-results {
+      margin: 10px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      max-height: 300px;
+      overflow-y: auto;
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 10px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .search-result-item {
+      padding: 8px 12px;
+      background: var(--glass);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: var(--transition);
+      font-size: 0.9rem;
+      color: var(--text);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .search-result-item:hover {
+      background: rgba(37, 99, 235, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .search-result-item .title {
+      flex: 1;
+    }
+
+    .search-result-item .subject {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
   </style>
 </head>
 <body>
@@ -1763,7 +1792,7 @@ body::-webkit-scrollbar{display:none;}
         </div>
         <div class="searchbar">
           <i class="fas fa-search"></i>
-          <input id="search-subjects" type="search" placeholder="সাবজেক্ট খুঁজুন...">
+          <input id="search-subjects" type="search" placeholder="ক্লাস শিরোনাম সার্চ করুন...">
         </div>
         <div class="controls">
           <button class="btn" id="refresh-data-btn"><i class="fas fa-sync-alt"></i> <span class="bangla-font">ডেটা রিফ্রেশ</span></button>
@@ -1772,7 +1801,9 @@ body::-webkit-scrollbar{display:none;}
         </div>
       </nav>
     </header>
-    <div class="notice-bar bangla-font"><span><b>নতুন যোগ করা হয়েছে: ড্যাশবোর্ড এবং কমেন্ট সুবিধা! আপনার শিক্ষা যাত্রার অগ্রগতি পর্যবেক্ষণ করুন এবং আপনার মূল্যবান মতামত আমাদের জানান।</b></span></div>
+    <div id="search-results"></div>
+    <div class="notice-bar bangla-font"><span><b>👉 জিন্স সাজেশন 'ক্লাসের লেকচার শীট' ফোল্ডারে আপলোড করা হয়েছে।</b></span></div>
+    <div class="notice-bar bangla-font"><span><b>📢 বার্তা: প্রিয় শিক্ষার্থীরা, কমেন্টের রিপ্লাই সুবিধাটি সাময়িকভাবে স্থগিত আছে। তবে আপনাদের প্রতিটি মতামত আমরা যত্নসহকারে পড়ছি এবং প্রয়োজনীয় পদক্ষেপ নিচ্ছি। আপনাদের মূল্যবান মতামত জানাতে থাকুন — আন্তরিক ধন্যবাদ সাথে থাকার জন্য!</b></span></div>
     <main class="container">
       <div class="hero fade-in">
         <h1 class="bangla-font">Dakhil-26 "Final Stage Preparation Course"</h1>
@@ -1933,16 +1964,14 @@ body::-webkit-scrollbar{display:none;}
       </div>
     </div>
   </div>
-  <div id="reply-modal" class="warning-modal">
+  <div id="loading-modal" class="warning-modal" style="display: none;">
     <div class="modal-content">
       <div class="modal-header">
-        <h2 class="bangla-font">অ্যাডমিনের উত্তর</h2>
+        <h2 class="bangla-font">ডাটা লোড হচ্ছে...</h2>
       </div>
-      <div class="modal-body" id="reply-body">
-        <!-- dynamic content -->
-      </div>
-      <div class="modal-footer">
-        <button class="modal-ok-btn bangla-font" id="reply-ok-btn">ঠিক আছে</button>
+      <div class="modal-body">
+        <p class="bangla-font">দয়াকরে ডাটা লোড সম্পন্ন হওয়া পর্যন্ত অপেক্ষা করুন</p>
+        <div class="loading"></div>
       </div>
     </div>
   </div>
@@ -1963,7 +1992,7 @@ body::-webkit-scrollbar{display:none;}
       <h2 class="bangla-font">নাম সেট করুন</h2>
       <p class="bangla-font">আপনার নাম লিখুন। এটি সেভ হয়ে যাবে এবং পরবর্তীতে কমেন্ট ও রিপ্লাই দেখার জন্য ব্যবহৃত হবে।</p>
       <div class="warning-message bangla-font">
-        দয়া করে আপনার পূর্ণ নাম ব্যবহার করুন, যাতে অন্য কারো সাথে নামের কোনো মিল না হয়। একটি স্বতন্ত্র এবং ব্যতিক্রমী নাম নির্বাচন করুন, যেন আপনার মতামত এবং ব্যত্তর সঠিকভাবে সনাক্ত করা যায়।
+        দয়া করে আপনার পূর্ণ নাম ব্যবহার করুন, যাতে অন্য কারো সাথে নামের কোনো মিল না হয়। একটি স্বতন্ত্র এবং ব্যতিক্রমী নাম নির্বাচন করুন, যেন আপনার মতামত এবং উত্তর সঠিকভাবে সনাক্ত করা যায়।
       </div>
     </div>
     <div class="form-section">
@@ -2013,7 +2042,7 @@ body::-webkit-scrollbar{display:none;}
 <div class="success-message" id="successMessage">ফর্ম সফলভাবে জমা হয়েছে!</div>
 <div id="notification" class="notification"></div>
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbwaqLOJtB2sRkH3gGmiyp-uhFlFiK2X35tbEjMX_4pk5DcC2AjxUaJeX2JpUJFCkCDi/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbwmnSsAIbqPFKDDIVPsG4GpsLqb7JRnaKhmtvAKzxCBnP-Wia-GxZLnqVILuMfixENj/exec";
 
 function $(sel, root = document) { return root.querySelector(sel); }
 function $all(sel, root = document) { return Array.from(root.querySelectorAll(sel)); }
@@ -2024,6 +2053,7 @@ const loginPage = $('#login-page');
 const mainPage = $('#main-page');
 const subjectPage = $('#subject-page');
 const warningModal = $('#warning-modal');
+const loadingModal = $('#loading-modal');
 let allClasses = [];
 let groupedClassesCache = {};
 let mainScrollPosition = 0; // New: To save main page scroll position
@@ -2085,9 +2115,14 @@ function showWarningModal() {
 
 function closeWarningModal() {
   warningModal.classList.remove('show');
-  if (getUserRole() === 'user' && storedName) {
-    fetchRepliesAndShow();
-  }
+}
+
+function showLoadingModal() {
+  loadingModal.style.display = 'flex';
+}
+
+function hideLoadingModal() {
+  loadingModal.style.display = 'none';
 }
 
 function showNotification(message, isError = false, isWarning = false) {
@@ -2119,6 +2154,13 @@ function checkPassword() {
     mainPage.style.display = 'block';
     showWarningModal();
     showAddClassButton();
+    loadInitialData();
+    scrollToTop();
+  } else if (password === 'EDITOR@BOM-435') {
+    setLoginExpiry('editor');
+    loginPage.style.display = 'none';
+    mainPage.style.display = 'block';
+    showWarningModal();
     loadInitialData();
     scrollToTop();
   } else {
@@ -2261,7 +2303,7 @@ function normalizeRows(rows) {
       row.globalId = index + 1;
     });
 
-    // Group by subject for display
+    // Group by subject for display serial
     const groupedBySubject = sortedRows.reduce((acc, row) => {
       const subjectFromSheet = row.subject || 'Unknown Subject';
       const matchedSubject = findBestMatchingSubject(subjectFromSheet) || subjectFromSheet;
@@ -2461,7 +2503,52 @@ function filterTodayClasses(classes) {
   return classes.filter(cls => cls && cls.date === today);
 }
 
+function similarity(s1, s2) {
+  s1 = s1.toLowerCase();
+  s2 = s2.toLowerCase();
+  const m = s1.length;
+  const n = s2.length;
+  const dp = Array.from({ length: m + 1 }, () => Array(n + 1).fill(0));
+  for (let i = 0; i <= m; i++) dp[i][0] = i;
+  for (let j = 0; j <= n; j++) dp[0][j] = j;
+  for (let i = 1; i <= m; i++) {
+    for (let j = 1; j <= n; j++) {
+      const cost = s1[i - 1] === s2[j - 1] ? 0 : 1;
+      dp[i][j] = Math.min(
+        dp[i - 1][j] + 1,
+        dp[i][j - 1] + 1,
+        dp[i - 1][j - 1] + cost
+      );
+    }
+  }
+  const distance = dp[m][n];
+  const maxLen = Math.max(m, n);
+  return maxLen ? (maxLen - distance) / maxLen : 0;
+}
+
+function renderSearchResults(results) {
+  const container = $('#search-results');
+  container.innerHTML = '';
+  if (results.length === 0) {
+    container.innerHTML = '<div class="search-result-item bangla-font">কোনো ফলাফল পাওয়া যায়নি</div>';
+    return;
+  }
+  results.forEach(res => {
+    const item = document.createElement('div');
+    item.className = 'search-result-item';
+    item.innerHTML = `<span class="title bangla-font">${res.title}</span><span class="subject bangla-font">(${res.subject})</span>`;
+    item.addEventListener('click', () => {
+      highlightedClassTimestamp = res.timestamp;
+      showSubjectPage(res.subject, true);
+      container.innerHTML = '';
+      $('#search-subjects').value = '';
+    });
+    container.appendChild(item);
+  });
+}
+
 async function loadInitialData() {
+  showLoadingModal();
   if (!checkLoginExpiry()) {
     logout();
     return;
@@ -2473,6 +2560,7 @@ async function loadInitialData() {
 
   showAddClassButton();
   showDashboardButton();
+  hideLoadingModal();
 }
 
 function showSubjectPage(subject, fromTable = false) {
@@ -2521,11 +2609,11 @@ function initializeEventListeners() {
 
   $('#search-subjects').addEventListener('input', () => {
     const searchTerm = $('#search-subjects').value.trim().toLowerCase();
-    const pills = $all('.subject-link');
-    pills.forEach(pill => {
-      const subjectName = pill.getAttribute('data-name').toLowerCase();
-      pill.style.display = subjectName.includes(searchTerm) ? 'flex' : 'none';
-    });
+    const filtered = allClasses
+      .map(cls => ({ ...cls, sim: similarity(searchTerm, cls.title.toLowerCase()) }))
+      .filter(res => res.sim > 0.3)
+      .sort((a, b) => b.sim - a.sim);
+    renderSearchResults(filtered);
   });
 
   $all('.subject-link').forEach(link => {
@@ -3059,10 +3147,11 @@ function hideForm(){ $('#formModal').style.display='none'; }
 function showSubmissions(){ 
   $('#submissionsModal').style.display='flex'; 
   
+  // শুধু এই ১ লাইন যোগ করুন
   $('#submissions-list').innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted)" class="bangla-font">লোড হচ্ছে...</div>';
   
   loadSubmissions(); 
-}
+    }
 
 function hideSubmissions(){ $('#submissionsModal').style.display='none'; }
 
@@ -3112,10 +3201,12 @@ function loadSubmissions() {
       const list = $('#submissions-list');
       list.innerHTML = '';
       
+      // শুধুমাত্র Dakhil-26 ব্যাচ ফিল্টার করুন
       const dakhil26Submissions = data.filter(item => 
         item.batch && item.batch.toString().toLowerCase().includes('dakhil-26')
       );
       
+      // নতুন থেকে পুরানো সাজানো
       dakhil26Submissions.sort((a, b) => new Date(b.timestamp || b.time) - new Date(a.timestamp || a.time));
       
       if (dakhil26Submissions.length === 0) {
@@ -3133,111 +3224,11 @@ function loadSubmissions() {
           ${item.reply ? `<div class="submission-reply bangla-font">উত্তর: ${item.reply}</div>` : ''}
           <div class="submission-time bangla-font">${item.time}</div>
         `;
-        
-        if (getUserRole() === 'owner' && !item.reply) {
-          div.innerHTML += `
-            <textarea class="reply-input bangla-font" placeholder="উত্তর লিখুন..."></textarea>
-            <button class="reply-btn bangla-font">উত্তর দিন</button>
-          `;
-        }
-        
         list.appendChild(div);
-
-        if (getUserRole() === 'owner' && !item.reply) {
-          const btn = div.querySelector('.reply-btn');
-          btn.addEventListener('click', () => {
-            const input = btn.previousElementSibling;
-            const reply = input.value.trim();
-            if (!reply) return showNotification('উত্তর লিখুন', true);
-            btn.disabled = true;
-            const data = {
-              action: 'addReply',
-              originalTime: item.time,
-              name: item.name,
-              batch: item.batch,
-              message: item.message,
-              reply: reply
-            };
-            fetch(WEB_APP_URL, {
-              method: 'POST',
-              body: JSON.stringify(data)
-            })
-            .then(res => res.text())
-            .then(txt => {
-              btn.disabled = false;
-              if (txt.startsWith('Success')) {
-                showNotification('উত্তর সফলভাবে যোগ করা হয়েছে!');
-                loadSubmissions(); // refresh
-              } else {
-                showNotification('উত্তর যোগ হয়নি', true);
-              }
-            })
-            .catch(() => {
-              btn.disabled = false;
-              showNotification('উত্তর যোগ হয়নি', true);
-            });
-          });
-        }
       });
     })
     .catch(() => showNotification("সাবমিশন লোড হয়নি! আবার চেষ্টা করুন।", true));
-}
-
-let pendingReplies = [];
-
-function fetchRepliesAndShow() {
-  fetch(WEB_APP_URL + '?action=getReplies')
-    .then(res => res.json())
-    .then(data => {
-      const viewed = JSON.parse(localStorage.getItem('viewedReplies') || '[]');
-      const oneMonthMs = 30 * 24 * 60 * 60 * 1000;
-      const now = Date.now();
-      pendingReplies = data.filter(item => 
-        item.name === storedName &&
-        !viewed.includes(item.timestamp) &&
-        (now - new Date(item.timestamp).getTime()) < oneMonthMs
-      );
-      pendingReplies.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp)); // old first
-      showNextReply();
-    })
-    .catch(err => console.error('Failed to fetch replies', err));
-}
-
-function showNextReply() {
-  if (pendingReplies.length > 0) {
-    const next = pendingReplies.shift();
-    showReply(next);
-  }
-}
-
-function showReply(reply) {
-  $('#reply-body').innerHTML = `
-    <p class="bangla-font"><strong>নাম:</strong> ${reply.name}</p>
-    <p class="bangla-font"><strong>সময়:</strong> ${reply.time}</p>
-    <p class="bangla-font"><strong>ব্যাচ:</strong> ${reply.batch}</p>
-    <p class="bangla-font"><strong>কমেন্ট:</strong> ${reply.message}</p>
-    <p class="bangla-font"><strong>উত্তর:</strong> ${reply.reply}</p>
-  `;
-  const replyModal = $('#reply-modal');
-  replyModal.classList.add('show');
-  $('#reply-ok-btn').onclick = () => {
-    closeReplyModal();
-    markReplyViewed(reply.timestamp);
-    showNextReply();
-  }
-}
-
-function closeReplyModal() {
-  const replyModal = $('#reply-modal');
-  replyModal.classList.remove('show');
-}
-
-function markReplyViewed(timestamp) {
-  const viewed = JSON.parse(localStorage.getItem('viewedReplies') || '[]');
-  viewed.push(timestamp);
-  localStorage.setItem('viewedReplies', JSON.stringify(viewed));
-}
-
+    }
 $('#form-button').addEventListener('click', handleFormClick);
 $('#submissions-button').addEventListener('click',showSubmissions);
 window.addEventListener('click',(e)=>{ 
@@ -3320,9 +3311,10 @@ function setButtonVisibility() {
   formButton.style.display = 'none';
   submissionsButton.style.display = 'none';
   
-  if (role === 'user') {
+  if (role === 'user' || role === 'editor') {
     formButton.style.display = 'inline-flex';
-  } else if (role === 'owner') {
+  } 
+  if (role === 'owner' || role === 'editor') {
     submissionsButton.style.display = 'inline-flex';
   }
     }
