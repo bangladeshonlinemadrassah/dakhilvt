@@ -2127,7 +2127,7 @@ function hideLoadingModal() {
 
 function showNotification(message, isError = false, isWarning = false) {
   const notification = $('#notification');
-  notification.innerHTML = `<i class="${isError ? 'fas fa-exclamation-circle' : isWarning ? 'fas fa-exclamation-triangle' : 'fas fa-check-circle'}"></i> ${message}`;
+  notification.innerHTML = "<i class=\"" + (isError ? 'fas fa-exclamation-circle' : isWarning ? 'fas fa-exclamation-triangle' : 'fas fa-check-circle') + "\"></i> " + message;
   notification.className = 'notification ' + (isError ? 'error' : isWarning ? 'warning' : 'success');
   notification.classList.add('show');
 
@@ -2153,7 +2153,6 @@ function checkPassword() {
     loginPage.style.display = 'none';
     mainPage.style.display = 'block';
     showWarningModal();
-    showAddClassButton();
     loadInitialData();
     scrollToTop();
   } else if (password === 'EDITOR@BOM-435') {
@@ -2173,14 +2172,15 @@ function checkPassword() {
 
 function showDashboardButton() {
   const dashboardBtn = $('#dashboard-btn');
-  if (getUserRole() === 'user') {
+  const role = getUserRole();
+  if (role === 'user' || role === 'editor') {
     dashboardBtn.style.display = 'inline-flex';
   }
 }
 
 function showAddClassButton() {
   const addClassBtn = $('#add-class-btn');
-  if (addClassBtn && getUserRole() === 'owner') {
+  if (addClassBtn && (getUserRole() === 'owner' || getUserRole() === 'editor')) {
     addClassBtn.style.display = 'inline-flex';
   }
 }
@@ -2526,8 +2526,21 @@ function similarity(s1, s2) {
   return maxLen ? (maxLen - distance) / maxLen : 0;
 }
 
+function maxWordSimilarity(searchTerm, title) {
+  const words = title.toLowerCase().split(/\s+/);
+  let maxSim = 0;
+  words.forEach(word => {
+    const sim = similarity(searchTerm, word);
+    if (sim > maxSim) maxSim = sim;
+  });
+  // Also check full title
+  const fullSim = similarity(searchTerm, title.toLowerCase());
+  return Math.max(maxSim, fullSim);
+}
+
 function renderSearchResults(results) {
   const container = $('#search-results');
+  container.style.display = 'flex'; // Show when rendering
   container.innerHTML = '';
   if (results.length === 0) {
     container.innerHTML = '<div class="search-result-item bangla-font">কোনো ফলাফল পাওয়া যায়নি</div>';
@@ -2608,13 +2621,19 @@ function initializeEventListeners() {
   });
 
   $('#search-subjects').addEventListener('input', () => {
-    const searchTerm = $('#search-subjects').value.trim().toLowerCase();
-    const filtered = allClasses
-      .map(cls => ({ ...cls, sim: similarity(searchTerm, cls.title.toLowerCase()) }))
-      .filter(res => res.sim > 0.3)
-      .sort((a, b) => b.sim - a.sim);
-    renderSearchResults(filtered);
-  });
+  const searchTerm = $('#search-subjects').value.trim().toLowerCase();
+  const resultsContainer = $('#search-results');
+  if (!searchTerm) {
+    resultsContainer.innerHTML = '';
+    resultsContainer.style.display = 'none'; // Hide when search is empty
+    return;
+  }
+  const filtered = allClasses
+    .map(cls => ({ ...cls, sim: maxWordSimilarity(searchTerm, cls.title) }))
+    .filter(res => res.sim > 0.3)
+    .sort((a, b) => b.sim - a.sim);
+  renderSearchResults(filtered);
+});
 
   $all('.subject-link').forEach(link => {
     link.addEventListener('click', e => {
@@ -3100,8 +3119,6 @@ document.addEventListener('DOMContentLoaded', () => {
   <script>
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzEX1EuBWpSMlZ9zbXs1lAVQkOTdeV779SsD6SF6RllQGMYxcHJu30p5BPzW7O-PAbysg/exec";
 
-function $(sel){ return document.querySelector(sel); }
-
 function showNotification(message, isError=false){
   const notification = $('#notification');
   notification.innerHTML = `<i class="${isError?'fas fa-exclamation-circle':'fas fa-check-circle'}"></i> <span class="bangla-font">${message}</span>`;
@@ -3177,7 +3194,7 @@ function submitForm(event){
     submitBtn.disabled = false;
     if(txt.startsWith("Success")){
       form.reset(); hideForm(); showSuccessMessage();
-    }else{
+    }else {
       showNotification("ডেটা জমা হয়নি! আবার চেষ্টা করুন।", true);
     }
   })
@@ -3317,7 +3334,7 @@ function setButtonVisibility() {
   if (role === 'owner' || role === 'editor') {
     submissionsButton.style.display = 'inline-flex';
   }
-    }
+}
 </script>
 </body>
 </html>
