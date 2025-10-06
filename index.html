@@ -2237,14 +2237,16 @@ function closeWarningModal() {
 // New loading overlay functions
 function showLoadingOverlay() {
   loadingOverlay.classList.remove('hidden');
+  loadingOverlay.style.display = 'flex'; // যেন আবার দেখা যায়
 }
 
 function hideLoadingOverlay() {
   loadingOverlay.classList.add('hidden');
+  loadingOverlay.style.display = 'none'; // সঙ্গে সঙ্গে লুকায়
 }
 
 function updateLoadingProgress(progress) {
-  const progressBar = $('#loading-progress-bar');
+  const progressBar = document.querySelector('#loading-progress-bar');
   if (progressBar) {
     progressBar.style.width = `${progress}%`;
   }
@@ -2256,8 +2258,8 @@ function showLoadingModal() {
 
 function hideLoadingModal() {
   loadingModal.style.display = 'none';
-}
-
+    }
+    
 function showNotification(message, isError = false, isWarning = false) {
   const notification = $('#notification');
   notification.innerHTML = "<i class=\"" + (isError ? 'fas fa-exclamation-circle' : isWarning ? 'fas fa-exclamation-triangle' : 'fas fa-check-circle') + "\"></i> " + message;
