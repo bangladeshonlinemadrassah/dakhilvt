@@ -1575,6 +1575,113 @@
       color: transparent;
     }
 
+    /* New Loading Overlay Styles */
+    #loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--darker);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      opacity: 1;
+      visibility: visible;
+      transition: opacity 0.3s, visibility 0.3s;
+    }
+
+    #loading-overlay.hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .loading-box {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 40px;
+      text-align: center;
+      max-width: 500px;
+      width: 90%;
+      backdrop-filter: blur(15px);
+      box-shadow: var(--shadow-lg);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .loading-box::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--gradient-primary);
+    }
+
+    .loading-title {
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      font-weight: 700;
+    }
+
+    .loading-message {
+      color: var(--text-muted);
+      margin-bottom: 25px;
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+
+    .loading-spinner {
+      width: 60px;
+      height: 60px;
+      border: 4px solid rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      border-top-color: var(--primary);
+      margin: 0 auto 20px;
+      animation: spin 1.5s linear infinite;
+    }
+
+    .loading-progress {
+      width: 100%;
+      height: 8px;
+      background: var(--glass);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 20px;
+    }
+
+    .loading-progress-bar {
+      height: 100%;
+      background: var(--gradient-primary);
+      width: 0%;
+      transition: width 0.5s ease;
+    }
+
+    .loading-dots {
+      display: inline-block;
+      margin-left: 5px;
+    }
+
+    .loading-dots::after {
+      content: '';
+      animation: dots 1.5s steps(4, end) infinite;
+    }
+
+    @keyframes dots {
+      0%, 20% { content: ''; }
+      40% { content: '.'; }
+      60% { content: '..'; }
+      80%, 100% { content: '...'; }
+    }
+
   </style>
   <style>
 :root{
@@ -1727,6 +1834,7 @@ body::-webkit-scrollbar{display:none;}
       border-radius: 12px;
       padding: 10px;
       box-shadow: var(--shadow-sm);
+      display: none; /* Initially hidden */
     }
 
     .search-result-item {
@@ -1759,6 +1867,18 @@ body::-webkit-scrollbar{display:none;}
   </style>
 </head>
 <body>
+  <!-- Loading Overlay - New Addition -->
+  <div id="loading-overlay">
+    <div class="loading-box">
+      <div class="loading-spinner"></div>
+      <h2 class="loading-title bangla-font">ডাটা লোড হচ্ছে<span class="loading-dots"></span></h2>
+      <p class="loading-message bangla-font">দয়াকরে ডাটা লোড সম্পন্ন হওয়া পর্যন্ত অপেক্ষা করুন</p>
+      <div class="loading-progress">
+        <div class="loading-progress-bar" id="loading-progress-bar"></div>
+      </div>
+    </div>
+  </div>
+
   <div id="login-page">
     <div class="login-container">
       <div class="welcome-message">
@@ -1792,8 +1912,9 @@ body::-webkit-scrollbar{display:none;}
         </div>
         <div class="searchbar">
           <i class="fas fa-search"></i>
-          <input id="search-subjects" type="search" placeholder="ক্লাস শিরোনাম সার্চ করুন...">
+          <input id="search-subjects" type="search" placeholder="কি খুজছেন🤔" class="dynamic-placeholder">
         </div>
+        <div id="search-results"></div>
         <div class="controls">
           <button class="btn" id="refresh-data-btn"><i class="fas fa-sync-alt"></i> <span class="bangla-font">ডেটা রিফ্রেশ</span></button>
           <button class="btn" id="dashboard-btn" style="display: none;"><i class="fas fa-tachometer-alt"></i> <span class="bangla-font">ড্যাশবোর্ড</span></button>
@@ -1801,7 +1922,6 @@ body::-webkit-scrollbar{display:none;}
         </div>
       </nav>
     </header>
-    <div id="search-results"></div>
     <div class="notice-bar bangla-font"><span><b>👉 জিন্স সাজেশন 'ক্লাসের লেকচার শীট' ফোল্ডারে আপলোড করা হয়েছে।</b></span></div>
     <div class="notice-bar bangla-font"><span><b>📢 বার্তা: প্রিয় শিক্ষার্থীরা, কমেন্টের রিপ্লাই সুবিধাটি সাময়িকভাবে স্থগিত আছে। তবে আপনাদের প্রতিটি মতামত আমরা যত্নসহকারে পড়ছি এবং প্রয়োজনীয় পদক্ষেপ নিচ্ছি। আপনাদের মূল্যবান মতামত জানাতে থাকুন — আন্তরিক ধন্যবাদ সাথে থাকার জন্য!</b></span></div>
     <main class="container">
@@ -2054,6 +2174,7 @@ const mainPage = $('#main-page');
 const subjectPage = $('#subject-page');
 const warningModal = $('#warning-modal');
 const loadingModal = $('#loading-modal');
+const loadingOverlay = $('#loading-overlay'); // New loading overlay
 let allClasses = [];
 let groupedClassesCache = {};
 let mainScrollPosition = 0; // New: To save main page scroll position
@@ -2117,6 +2238,22 @@ function closeWarningModal() {
   warningModal.classList.remove('show');
 }
 
+// New loading overlay functions
+function showLoadingOverlay() {
+  loadingOverlay.classList.remove('hidden');
+}
+
+function hideLoadingOverlay() {
+  loadingOverlay.classList.add('hidden');
+}
+
+function updateLoadingProgress(progress) {
+  const progressBar = $('#loading-progress-bar');
+  if (progressBar) {
+    progressBar.style.width = `${progress}%`;
+  }
+}
+
 function showLoadingModal() {
   loadingModal.style.display = 'flex';
 }
@@ -2145,6 +2282,7 @@ function checkPassword() {
     loginPage.style.display = 'none';
     mainPage.style.display = 'block';
     showWarningModal();
+    showLoadingOverlay(); // Show loading overlay
     loadInitialData();
     showDashboardButton();
     scrollToTop();
@@ -2153,6 +2291,7 @@ function checkPassword() {
     loginPage.style.display = 'none';
     mainPage.style.display = 'block';
     showWarningModal();
+    showLoadingOverlay(); // Show loading overlay
     loadInitialData();
     scrollToTop();
   } else if (password === 'EDITOR@BOM-435') {
@@ -2160,6 +2299,7 @@ function checkPassword() {
     loginPage.style.display = 'none';
     mainPage.style.display = 'block';
     showWarningModal();
+    showLoadingOverlay(); // Show loading overlay
     loadInitialData();
     scrollToTop();
   } else {
@@ -2266,7 +2406,7 @@ function findBestMatchingSubject(subjectFromSheet) {
 
 async function fetchData() {
   try {
-    showNotification("ডেটা লোড হচ্ছে...", false);
+    updateLoadingProgress(30);
     const res = await fetch(API_URL, {
       method: 'GET',
       headers: {
@@ -2278,9 +2418,10 @@ async function fetchData() {
       throw new Error(`HTTP error! status: ${res.status}`);
     }
 
+    updateLoadingProgress(60);
     const data = await res.json();
     if (data && data.ok) {
-      showNotification("ডেটা সফলভাবে লোড হয়েছে!");
+      updateLoadingProgress(90);
       console.log("API Response:", data);
       return data.rows || [];
     } else {
@@ -2295,6 +2436,7 @@ async function fetchData() {
 
 function normalizeRows(rows) {
   try {
+    updateLoadingProgress(40);
     // Sort all rows by timestamp ascending for global tracking ID
     const sortedRows = rows.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
 
@@ -2303,6 +2445,7 @@ function normalizeRows(rows) {
       row.globalId = index + 1;
     });
 
+    updateLoadingProgress(60);
     // Group by subject for display serial
     const groupedBySubject = sortedRows.reduce((acc, row) => {
       const subjectFromSheet = row.subject || 'Unknown Subject';
@@ -2346,6 +2489,7 @@ function normalizeRows(rows) {
       });
     });
 
+    updateLoadingProgress(80);
     return normalizedRows;
   } catch (error) {
     console.error("Rows normalization error:", error);
@@ -2540,12 +2684,14 @@ function maxWordSimilarity(searchTerm, title) {
 
 function renderSearchResults(results) {
   const container = $('#search-results');
-  container.style.display = 'flex'; // Show when rendering
-  container.innerHTML = '';
   if (results.length === 0) {
-    container.innerHTML = '<div class="search-result-item bangla-font">কোনো ফলাফল পাওয়া যায়নি</div>';
+    container.style.display = 'none';
+    container.innerHTML = '';
     return;
   }
+  
+  container.style.display = 'flex';
+  container.innerHTML = '';
   results.forEach(res => {
     const item = document.createElement('div');
     item.className = 'search-result-item';
@@ -2555,25 +2701,33 @@ function renderSearchResults(results) {
       showSubjectPage(res.subject, true);
       container.innerHTML = '';
       $('#search-subjects').value = '';
+      container.style.display = 'none';
     });
     container.appendChild(item);
   });
 }
 
 async function loadInitialData() {
-  showLoadingModal();
+  showLoadingOverlay(); // Show loading overlay
+  updateLoadingProgress(10);
   if (!checkLoginExpiry()) {
     logout();
     return;
   }
 
   const rows = await fetchData();
+  updateLoadingProgress(95);
   allClasses = normalizeRows(rows);
   renderTodayClassesSummary(filterTodayClasses(allClasses));
 
   showAddClassButton();
   showDashboardButton();
-  hideLoadingModal();
+  
+  // Hide loading overlay after a short delay to ensure everything is loaded
+  setTimeout(() => {
+    hideLoadingOverlay();
+    updateLoadingProgress(0);
+  }, 500);
 }
 
 function showSubjectPage(subject, fromTable = false) {
@@ -2625,7 +2779,7 @@ function initializeEventListeners() {
   const resultsContainer = $('#search-results');
   if (!searchTerm) {
     resultsContainer.innerHTML = '';
-    resultsContainer.style.display = 'none'; // Hide when search is empty
+    resultsContainer.style.display = 'none';
     return;
   }
   const filtered = allClasses
@@ -2691,6 +2845,8 @@ function initializeEventListeners() {
   });
 
   $('#refresh-data-btn').addEventListener('click', async () => {
+    showLoadingOverlay();
+    updateLoadingProgress(10);
     const rows = await fetchData();
     allClasses = normalizeRows(rows);
     groupedClassesCache = {};
@@ -2700,6 +2856,7 @@ function initializeEventListeners() {
       showSubjectPage(currentSubject);
     }
     
+    hideLoadingOverlay();
     showNotification("ডেটা রিফ্রেশ হয়েছে!");
   });
 }
@@ -3114,6 +3271,9 @@ document.addEventListener('DOMContentLoaded', () => {
     subjectPage.style.display = 'none';
   }
   initializeEventListeners();
+  
+  // Initialize dynamic placeholder
+  initDynamicPlaceholder();
 });
   </script>
   <script>
@@ -3334,6 +3494,35 @@ function setButtonVisibility() {
   if (role === 'owner' || role === 'editor') {
     submissionsButton.style.display = 'inline-flex';
   }
+}
+
+// Dynamic placeholder functionality
+function initDynamicPlaceholder() {
+  const searchInput = $('#search-subjects');
+  const placeholders = [
+    'কি খুজছেন?🤔',
+    'সাজেশন্স🔥',
+    'জিন্স সাজেশন্স💥',
+    '👉ক্লাস',
+    '💡মিশন',
+    '👉ইক্সাম',
+    'শীট🗞',
+    'সার্চ করুন যা দরকার🔍'
+  ];
+  
+  let currentIndex = 0;
+  
+  // Function to update placeholder
+  function updatePlaceholder() {
+    searchInput.placeholder = placeholders[currentIndex];
+    currentIndex = (currentIndex + 1) % placeholders.length;
+  }
+  
+  // Update every 3 seconds
+  setInterval(updatePlaceholder, 4000);
+  
+  // Initialize with first placeholder
+  updatePlaceholder();
 }
 </script>
 </body>
