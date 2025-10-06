@@ -1577,22 +1577,26 @@
 
     /* New Loading Overlay Styles */
     #loading-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: var(--darker);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-}
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--darker);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      opacity: 1;
+      visibility: visible;
+      transition: opacity 0s, visibility 0s;
+    }
 
-#loading-overlay.hidden {
-  display: none !important;
-}
+    #loading-overlay.hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
 
     .loading-box {
       background: var(--card-bg);
@@ -1642,7 +1646,7 @@
       border-radius: 50%;
       border-top-color: var(--primary);
       margin: 0 auto 20px;
-      animation: spin 0s linear infinite;
+      animation: spin 1.5s linear infinite;
     }
 
     .loading-progress {
@@ -1658,7 +1662,7 @@
       height: 100%;
       background: var(--gradient-primary);
       width: 0%;
-      transition: width 0s ease;
+      transition: width 0.5s ease;
     }
 
     .loading-dots {
@@ -2237,16 +2241,14 @@ function closeWarningModal() {
 // New loading overlay functions
 function showLoadingOverlay() {
   loadingOverlay.classList.remove('hidden');
-  loadingOverlay.style.display = 'flex'; // যেন আবার দেখা যায়
 }
 
 function hideLoadingOverlay() {
   loadingOverlay.classList.add('hidden');
-  loadingOverlay.style.display = 'none'; // সঙ্গে সঙ্গে লুকায়
 }
 
 function updateLoadingProgress(progress) {
-  const progressBar = document.querySelector('#loading-progress-bar');
+  const progressBar = $('#loading-progress-bar');
   if (progressBar) {
     progressBar.style.width = `${progress}%`;
   }
@@ -2258,8 +2260,8 @@ function showLoadingModal() {
 
 function hideLoadingModal() {
   loadingModal.style.display = 'none';
-    }
-    
+}
+
 function showNotification(message, isError = false, isWarning = false) {
   const notification = $('#notification');
   notification.innerHTML = "<i class=\"" + (isError ? 'fas fa-exclamation-circle' : isWarning ? 'fas fa-exclamation-triangle' : 'fas fa-check-circle') + "\"></i> " + message;
@@ -2721,10 +2723,13 @@ async function loadInitialData() {
   showAddClassButton();
   showDashboardButton();
   
-  // Hide loading overlay immediately after loading completes
-hideLoadingOverlay();
-updateLoadingProgress(0);
-  
+  // Hide loading overlay after a short delay to ensure everything is loaded
+  setTimeout(() => {
+    hideLoadingOverlay();
+    updateLoadingProgress(0);
+  }, 100);
+}
+
 function showSubjectPage(subject, fromTable = false) {
   currentSubject = subject;
   mainScrollPosition = window.scrollY; // Save main page scroll position
