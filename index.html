@@ -2721,13 +2721,10 @@ async function loadInitialData() {
   showAddClassButton();
   showDashboardButton();
   
-  // Hide loading overlay after a short delay to ensure everything is loaded
-  setTimeout(() => {
-    hideLoadingOverlay();
-    updateLoadingProgress(0);
-  }, 0);
-}
-
+  // Hide loading overlay immediately after loading completes
+hideLoadingOverlay();
+updateLoadingProgress(0);
+  
 function showSubjectPage(subject, fromTable = false) {
   currentSubject = subject;
   mainScrollPosition = window.scrollY; // Save main page scroll position
