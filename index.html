@@ -1918,7 +1918,7 @@ body::-webkit-scrollbar{display:none;}
         <div class="controls">
           <button class="btn" id="refresh-data-btn"><i class="fas fa-sync-alt"></i> <span class="bangla-font">ডেটা রিফ্রেশ</span></button>
           <button class="btn" id="dashboard-btn" style="display: none;"><i class="fas fa-tachometer-alt"></i> <span class="bangla-font">ড্যাশবোর্ড</span></button>
-          <a class="btn" id="add-class-btn" href="https://docs.google.com/forms/d/e/1FAIpQLSfL0sFmx3IiTXCiFFraymOe65ITt6TqtTJVgjQln5dpAgk1oQ/viewform?usp=header" target="_blank" rel="noopener" style="display: none;"><i class="fas fa-plus-circle"></i> <span class="bangla-font">ক্লাস যুক্ত করুন</span></a>
+          <a class="btn" id="add-class-btn" href="https://docs.google.com/forms/d/e/1FAIpQLScxUYNsEFpE3YA9DBA7GtDadTJ3TXJd9-xgKesRlOrVrjvj1w/viewform?usp=header" target="_blank" rel="noopener" style="display: none;"><i class="fas fa-plus-circle"></i> <span class="bangla-font">ক্লাস যুক্ত করুন</span></a>
         </div>
       </nav>
     </header>
@@ -2306,7 +2306,7 @@ function checkPassword() {
   const password = $('#password').value.trim();
   const errorElement = $('#error-message');
   
-  if (password === 'USERDAKHIL26') {
+  if (password === 'USERALIM26') {
     setLoginExpiry('user');
     loginPage.style.display = 'none';
     mainPage.style.display = 'block';
@@ -2315,7 +2315,7 @@ function checkPassword() {
     loadInitialData();
     showDashboardButton();
     scrollToTop();
-  } else if (password === 'OWNERDAKHIL26') {
+  } else if (password === 'OWNERALIM26') {
     setLoginExpiry('owner');
     loginPage.style.display = 'none';
     mainPage.style.display = 'block';
